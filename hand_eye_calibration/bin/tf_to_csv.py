@@ -36,6 +36,7 @@ def write_transformation_to_csv_file(bag_file, target_frame, source_frame,
   start_time_tf_message = rospy.Time()
   end_time_tf_message = rospy.Time()
   csv_file = open(csv_file_name, 'w')
+  # ctr = 0
   print("Looking up transforms and writing to csv file...")
   for topic, msg, t in bag.read_messages():
     if topic == "/tf" and msg.transforms:
@@ -65,12 +66,14 @@ def write_transformation_to_csv_file(bag_file, target_frame, source_frame,
 
           # Write to csv file.
           quaternion = np.array(hamilton_quaternion)
+          # if (ctr % 10 == 0):
           csv_file.write(
               str(single_tf.header.stamp.to_sec()) + ', ' +
               str(translation[0]) + ', ' + str(translation[1]) + ', ' +
               str(translation[2]) + ', ' + str(quaternion[0]) + ', ' +
               str(quaternion[1]) + ', ' + str(quaternion[2]) + ', ' +
               str(quaternion[3]) + '\n')
+          # ctr += 1
 
           # Update end time.
           end_time_tf_message = single_tf.header.stamp

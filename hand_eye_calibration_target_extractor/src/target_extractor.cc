@@ -3,6 +3,7 @@
 
 #include <aslam/calibration/target-aprilgrid.h>
 #include <aslam/cameras/camera.h>
+#include <aslam/cameras/camera-factory.h>
 #include <aslam/common/pose-types.h>
 #include <aslam/geometric-vision/pnp-pose-estimator.h>
 #include <glog/logging.h>
@@ -232,8 +233,17 @@ int main(int argc, char** argv) {
       }
     }
 
-    aslam::Camera::Ptr camera;
-    camera->deserializeFromFile(FLAGS_eval_camera_yaml);
+    YAML::Node yaml_node;
+    try {
+      yaml_node = YAML::LoadFile(FLAGS_eval_camera_yaml.c_str());
+    } catch (const std::exception& ex) { 
+      LOG(ERROR) << "Failed to load YAML node from file " 
+                << FLAGS_eval_camera_yaml
+                << " with the error: " << ex.what();
+      return false;
+    }
+
+    aslam::Camera::Ptr camera = aslam::createCamera(yaml_node);
     CHECK(camera);
 
     constexpr bool kRunNonlinearRefinement = true;
